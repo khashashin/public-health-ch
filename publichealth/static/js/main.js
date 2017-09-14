@@ -5,18 +5,73 @@ $(document).ready(function() {
 		return this.hostname && this.hostname !== location.hostname;
 	}).attr('target', '_blank');
 
-	// Initialise front page carousel component
-	$('.carousel-inner.slick').slick({
-		autoplay: true,
-		autoplaySpeed: '10000',
-		dots: true,
+	if ($('#carousel-banner').length) {
+		// Initialise front page carousel component
+		$('.carousel-inner').slick({
+			autoplay: true,
+			autoplaySpeed: '10000',
+			dots: true,
+			infinite: true,
+			speed: 1000,
+			fade: true,
+			cssEase: 'linear',
+			prevArrow: '<span class="arrow left glyphicon glyphicon-chevron-left" aria-hidden="true">Previous</span>',
+			nextArrow: '<span class="arrow right glyphicon glyphicon-chevron-right" aria-hidden="true">Next</span>',
+		});
+
+	} else if ($('.carousel-gallery').length) {
+		// Load gallery component
+		$('.carousel-gallery').slick({
+			slidesToShow: 1,
+			slidesToScroll: 1,
+			arrows: false,
+			fade: true,
+			asNavFor: '.slider-nav'
+		}).slickLightbox({
+		  src: 'data-src',
+		  itemSelector: 'img',
+    	caption: 'caption',
+			captionPosition: 'bottom'
+		});
+	}
+
+	// Slider navigation
+	$('.slider-nav').slick({
+		slidesToShow: 3,
+		slidesToScroll: 1,
 		infinite: true,
-		speed: 1000,
-		fade: true,
-		cssEase: 'linear',
+		asNavFor: '.carousel-gallery',
+		centerMode: true,
+		focusOnSelect: true,
+		// Responsive settings
+		responsive: [
+		{
+			breakpoint: 768,
+			settings: {
+				arrows: false,
+				centerMode: true,
+				centerPadding: '30px',
+				slidesToShow: 3
+			}
+		},
+		{
+			breakpoint: 480,
+			settings: {
+				arrows: false,
+				centerMode: true,
+				centerPadding: '30px',
+				slidesToShow: 1
+			}
+		}
+	],
 		prevArrow: '<span class="arrow left glyphicon glyphicon-chevron-left" aria-hidden="true">Previous</span>',
 		nextArrow: '<span class="arrow right glyphicon glyphicon-chevron-right" aria-hidden="true">Next</span>',
+	}).slickLightbox({
+		src: 'data-src',
+		itemSelector: 'img',
+		caption: 'caption'
 	});
+
 
 	// Pastel colors on live news
 	// $('.feedpage-body .panel').each(function() {
