@@ -16,40 +16,47 @@ def parse(obj, raw, stream):
     obj.published = datetime.fromtimestamp(ts)
 
     # Authorship and title
-    obj.title = raw['title']
+    obj.title = raw['title'][:250]
     if 'author' in raw['origin']:
-        obj.author = raw['author']
+        obj.author = raw['author'][:250]
     elif 'title' in raw['origin']:
-        obj.author = raw['origin']['title']
+        obj.author = raw['origin']['title'][:250]
 
     # Parse links and references
     if len(raw['alternate']) > 0:
-        obj.link = raw['alternate'][0]['href']
+        obj.link = raw['alternate'][0]['href'][:500]
     if 'thumbnail' in raw and len(raw['thumbnail']) > 0:
         if 'url' in raw['thumbnail'][0]:
-            obj.visual = raw['thumbnail'][0]['url']
+            obj.visual = raw['thumbnail'][0]['url'][:500]
     elif 'enclosure' in raw and len(raw['enclosure']) > 0:
         if 'href' in raw['enclosure'][0]:
-            obj.visual = raw['enclosure'][0]['href']
+            obj.visual = raw['enclosure'][0]['href'][:500]
     elif 'visual' in raw and 'url' in raw['visual']:
-        obj.visual = raw['visual']['url']
+        obj.visual = raw['visual']['url'][:500]
     if obj.visual.lower().strip() == 'none':
         obj.visual = ''
 
     # Collect text in nested JSON content
-    if 'content' in obj.raw:
-        obj.content = obj.raw['content']
-    else:
-        if 'summary' in obj.raw:
-            if 'content' in obj.raw['summary']:
-                obj.content = obj.raw['summary']['content']
-            else:
-                obj.content = obj.raw['summary']
+    if 'summary' in obj.raw:
+        if 'content' in obj.raw['summary']:
+            obj.content = obj.raw['summary']['content']
         else:
-            obj.content = ''
+            obj.content = obj.raw['summary']
+    elif 'content' in obj.raw:
+        if 'content' in obj.raw['content']:
+            obj.content = obj.raw['content']['content']
+        else:
+            obj.content = obj.raw['content']
+    elif 'fullContent' in obj.raw:
+        obj.content = obj.raw['fullContent']
+    else:
+        obj.content = ''
 
     # Detect language
-    obj.lang = guess_language(obj.content) or ''
+    try:
+        obj.lang = guess_language(obj.content) or ''
+    except:
+        obj.lang = ''
 
     # Collect tags
     tags = []

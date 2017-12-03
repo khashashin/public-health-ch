@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import translation
+from django.conf import settings
 
 from modelcluster.fields import ParentalKey
 
@@ -16,7 +17,7 @@ from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 from wagtail.wagtailsearch import index
 
 from puput.models import EntryPage, BlogPage
-from feedler.models import Entry
+from feedler.models import Entry, Stream
 from itertools import chain
 
 from ..util import TranslatedField
@@ -108,18 +109,18 @@ class ArticlePage(Page):
     body_de = StreamField([
         ('paragraph', RichTextBlock()),
         ('section', CharBlock(classname="full title")),
-        ('info', InfoBlock()),
-        ('placer', ChoiceBlock(choices=[
+        ('info', InfoBlock(icon='help')),
+        ('media', ChoiceBlock(choices=[
             ('gallery', 'Image gallery'),
-        ], icon='user'))
+        ], icon='media'))
     ], null=True, blank=True)
     body_fr = StreamField([
         ('paragraph', RichTextBlock()),
         ('section', CharBlock(classname="full title")),
-        ('info', InfoBlock()),
-        ('placer', ChoiceBlock(choices=[
+        ('info', InfoBlock(icon='help')),
+        ('media', ChoiceBlock(choices=[
             ('gallery', 'Image gallery'),
-        ], icon='user'))
+        ], icon='media'))
     ], null=True, blank=True)
     trans_body = TranslatedField(
         'body_de',
@@ -246,11 +247,11 @@ class HomePage(Page):
         posts = EntryPage.objects.live().descendant_of(parent[0])
         # Order by most recent date first
         posts = posts.order_by('-date')
-        return posts[:3]
+        return posts[:settings.BLOG_ENTRIES_HOME_PAGE]
 
     @property
     def newsentries(self):
-        # Get the last few news entries
+        # Get the last few news entries for the home page
         entries = Entry.objects.all().order_by('-published')
         # Filter out by current language
         curlang = translation.get_language()
@@ -258,7 +259,15 @@ class HomePage(Page):
             entries = entries.exclude(lang='fr')
         elif curlang in ['fr']:
             entries = entries.exclude(lang='de')
-        return entries[:3]
+        news = events = jobs = []
+        Stream1 = Stream.objects.filter(title='News')
+        if Stream1: news = entries.filter(stream=Stream1)
+        Stream2 = Stream.objects.filter(title='Events')
+        if Stream2: events = entries.filter(stream=Stream2)
+        Stream3 = Stream.objects.filter(title='Jobs')
+        if Stream3: jobs = entries.filter(stream=Stream3)
+        i = settings.NEWS_ENTRIES_HOME_PAGE
+        return list(chain(news[:i], events[:i], jobs[:i]))
 
     def get_context(self, request):
         # Update template context
@@ -266,6 +275,7 @@ class HomePage(Page):
         context['featured'] = self.featured
         context['blogentries'] = self.blogentries
         context['newsentries'] = self.newsentries
+        context['entryfeeds'] = settings.STREAMS_ON_HOME_PAGE
         return context
 
     parent_page_types = ['wagtailcore.Page']

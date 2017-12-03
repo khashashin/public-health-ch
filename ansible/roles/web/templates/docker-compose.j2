@@ -13,12 +13,12 @@ web:
     - "5000:5000"
   environment:
     - DJANGO_SETTINGS_MODULE={{ django_project_name }}.settings.production
-    - ALLOWED_HOSTS={{ domain }},{{ ipv4_addresses|join(':5000,') }}
+    - ALLOWED_HOSTS={{ domain }},www.{{ domain }},{{ ipv4_addresses|join(':5000,') }}
     - SECRET_KEY={{ django_secret_key }}
     - MAILGUN_KEY={{ django_email_key }}
     - MAILGUN_DOMAIN={{ django_email_domain }}
     - MAILGUN_FROM={{ django_email_from }}
-    - DATABASE_URL=postgres://postgres:@postgres:5432/postgres
+    - DATABASE_URL={{ django_postgres_url }}
     - ELASTICSEARCH_URL=http://elasticsearch:9200
     - REDIS_URL=redis://redis:6379
     - LOG_DIR=/var/log/wagtail

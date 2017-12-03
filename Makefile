@@ -66,7 +66,8 @@ logs:
 	docker-compose logs -f --tail=500
 
 backup:
-	docker-compose exec web ./manage.py dumpdata --natural-foreign --indent=4 -e contenttypes -e auth.Permission -e sessions -e wagtailcore.pagerevision -e wagtailcore.groupcollectionpermission > ~/publichealth.home.json
+	docker-compose start postgres
+	docker-compose exec web ./manage.py dumpdata --natural-foreign -e auth.permission -e contenttypes -e wagtailcore.GroupCollectionPermission -e wagtailimages.rendition -e sessions -e feedler.feedlysettings > ~/publichealth.home.json
 	zip ~/publichealth.home.json.`date +"%d%m%Y-%H%M"`.zip ~/publichealth.home.json
 	rm ~/publichealth.home.json
 
@@ -99,6 +100,6 @@ pg-restore:
 
 pg-surefire-drop-restore-db:
 	# drop existing database, recreate it, and then restore its content from backup.
-	-docker-compose exec postgres bash -c 'dropdb -h localhost -U postgres postgres'
+	docker-compose exec postgres bash -c 'dropdb -h localhost -U postgres postgres'
 	docker-compose exec postgres bash -c 'createdb -h localhost -U postgres postgres'
 	make pg-restore
