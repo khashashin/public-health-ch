@@ -9,29 +9,26 @@ This project is open source under the [MIT License](LICENSE.md).
 
 ## Development environment
 
-The easiest way to set up your machine would be to use [Vagrant](https://vagrantup.com), then in the project folder in the terminal type: `vagrant up`. Then when it is ready, follow instructions for *Database setup*.
+The easiest way to set up your machine would be to use [Vagrant](https://vagrantup.com), then in the project folder in the terminal type: `vagrant up`. Then when it is ready, follow instructions for *publichealth/static/org/archive-message.html#Database setup*.
 
 To set up a full development environment, follow all these instructions.
 
 **Frontend setup**
 
-If not using Vagrant, you will need to have Ruby and SASS installed on your system, e.g.:
+Make sure a recent version of node.js (we recommend using [nave.sh](https://gipublichealth/static/org/archive-message.htmlthub.com/isaacs/nave)), then:
 
 ```
-sudo apt-get install ruby-sass
+npm install -g yarn grunt-cli
+yarn install
 ```
 
-Make sure a recent version of node.js (we recommend using [nave.sh](https://github.com/isaacs/nave)), then:
+The first command (`..install -g..`) may require `sudo` if you installed node.js as a system package. Afterwards, to compile the frontend, you should be able to run:
 
-```
-npm install -g bower grunt-cli
-npm install
-bower install
-```
+`grunt`
 
-The first command (`..install -g..`) may require `sudo` if you installed node.js as a system package.
+If you are only working on the frontend, you can start a local webserver and work on frontend assets without the backend setup described below. There is a `grunt browser-sync` setup for working with frontend assets.
 
-If you are only working on the frontend, you can start a local webserver and work on frontend assets without the backend setup described below. Mock content is at `mockup`, and there is a `grunt browser-sync` setup for working with frontend assets.
+(In a Vagrant shell, use the alias `watch`)
 
 **Backend setup**
 
@@ -86,7 +83,21 @@ Now access the admin panel with the user account you created earlier: http://loc
 
 We use [Ansible](https://www.ansible.com) and [Docker Compose](https://docs.docker.com/compose/reference/overview/) for automated deployment.
 
-To use Docker Compose to deploy the site, copy `ansible/roles/web/templates/docker-compose.j2` to `/docker-compose.yml` and fill in all `{{ variables }}`. This is done automatically in Ansible.
+To use Docker Compose to manually deploy the site, copy `ansible/roles/web/templates/docker-compose.j2` to `/docker-compose.yml` and fill in all `{{ variables }}`. This can also be done automatically in Ansible.
+
+Install or update the following roles from [Ansible Galaxy](https://docs.ansible.com/ansible/latest/reference_appendices/galaxy.html) to use our scripts:
+
+```
+ansible-galaxy install \
+   dev-sec.nginx-hardening dev-sec.ssh-hardening dev-sec.os-hardening \
+   geerlingguy.nodejs geerlingguy.certbot
+```
+
+To check that the scripts and roles are correctly installed, use this command to do a "dry run":
+
+```
+ansible-playbook -s ansible/*.yaml -i ansible/inventories/production --syntax-check --list-tasks
+```
 
 To do production deployments, you need to obtain SSH and vault keys from your system administrator (who has followed the Ansible guide to set up a vault..), and place these in a `.keys` folder. To deploy a site:
 
@@ -132,6 +143,10 @@ For further deployment and system maintenance we have a `Makefile` which automat
 ansible-playbook -s ansible/site.yaml -i ansible/inventories/production --tags release
 ssh -i .keys/ansible.pem ansible@<server-ip> "cd <release_dir> && make release"
 ```
+
+This is already part of the normal release cycle, but if you wish to update the Docker images to the latest versions separately, use:
+
+`make upgrade`
 
 ### Restoring a data backup
 

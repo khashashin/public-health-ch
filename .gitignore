@@ -8,6 +8,7 @@
 /env/
 /venv/
 /static/
+/assets/
 /media/
 /tmp/
 /.keys/
@@ -15,5 +16,5 @@
 /Vagrantfile.local
 /docs/_build/
 /node_modules/
-/publichealth/static/libs/
-/mockup/assets/css/*.css
+/publichealth/static/libs
+publichealth.home.json

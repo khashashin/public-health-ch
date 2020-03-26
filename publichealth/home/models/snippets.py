@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from wagtail.wagtailsnippets.models import register_snippet
+from wagtail.snippets.models import register_snippet
 
-from wagtail.wagtailcore.models import Page
-from wagtail.wagtailadmin.edit_handlers import FieldPanel, PageChooserPanel
+from wagtail.core.models import Page
+from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.admin.edit_handlers import FieldPanel, PageChooserPanel
 
 from .forms import ContactForm
 from ..util import TranslatedField
@@ -27,9 +28,14 @@ class SocialContact(models.Model):
         choices=SOCIAL_NETWORK_SUPPORTED)
     profile = models.CharField(max_length=255, default="",
         help_text="Name of the account, e.g. @myaccount, or full URL")
+    home_site = models.ForeignKey(
+        'wagtailcore.Site', null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+')
     panels = [
         FieldPanel('network'),
         FieldPanel('profile'),
+        FieldPanel('home_site'),
     ]
     social_networks = dict(SOCIAL_NETWORK_SUPPORTED)
     def network_title(self):
@@ -52,14 +58,26 @@ class Contact(models.Model):
     """
     title = models.CharField(max_length=255, default="")
     title_fr = models.CharField(max_length=255, default="")
+    title_en = models.CharField(max_length=255, default="")
     trans_title = TranslatedField(
         'title',
         'title_fr',
+        'title_en',
     )
+
     address = models.TextField(default="", blank=True)
-    phone = models.CharField(max_length=40, default="")
-    email = models.EmailField(max_length=100, default="")
+    phone = models.CharField(max_length=40, blank=True, default="")
+    email = models.EmailField(max_length=100, blank=True, default="")
     www = models.URLField(null=True, blank=True)
+
+    style = models.TextField(default="", blank=True)
+    color = models.CharField(max_length=40, blank=True, default="")
+    logo = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
 
     map_url = models.URLField(null=True, blank=True,
         help_text="Optional link of address to mapping provider")
@@ -73,12 +91,24 @@ class Contact(models.Model):
         related_name='+',
     )
 
+    home_site = models.ForeignKey(
+        'wagtailcore.Site',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+
     panels = Page.content_panels + [
         FieldPanel('title_fr'),
+        FieldPanel('title_en'),
+        FieldPanel('home_site'),
         FieldPanel('address'),
         FieldPanel('phone'),
         FieldPanel('email'),
         FieldPanel('www'),
+        ImageChooserPanel('logo'),
+        FieldPanel('color'),
+        FieldPanel('style'),
         FieldPanel('map_url'),
         FieldPanel('analytics'),
         PageChooserPanel('contact_form', 'home.ContactForm'),
@@ -99,7 +129,7 @@ class Contact(models.Model):
         return { 'server': sa[0], 'site': sa[1] }
     def trans_title_styled(self):
         v = self.trans_title.split(' ')
-        if len(v) != 3: return v
+        if len(v) != 3: return self.trans_title
         return "<strong>%s %s</strong> %s" % tuple(v)
     def __str__(self):
         return self.trans_title

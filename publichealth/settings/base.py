@@ -36,25 +36,27 @@ INSTALLED_APPS = [
     'publichealth.home.templatetags',
     'publichealth.search',
 
-    'wagtail.contrib.wagtailsearchpromotions',
-    'wagtail.contrib.wagtailroutablepage',
-    'wagtail.contrib.wagtailsitemaps',
+    'wagtail.contrib.routable_page',
+    'wagtail.contrib.sitemaps',
     'wagtail.contrib.modeladmin',
     'wagtail.contrib.settings',
-    'wagtail.wagtailforms',
-    'wagtail.wagtailredirects',
-    'wagtail.wagtailembeds',
-    'wagtail.wagtailsites',
-    'wagtail.wagtailusers',
-    'wagtail.wagtailsnippets',
-    'wagtail.wagtaildocs',
-    'wagtail.wagtailimages',
-    'wagtail.wagtailsearch',
-    'wagtail.wagtailadmin',
-    'wagtail.wagtailcore',
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.contrib.search_promotions',
+
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
 
     'wagtail.api.v2',
     'rest_framework',
+    'crispy_forms', # required by rest_framework
 
     'modelcluster',
     'compressor',
@@ -62,6 +64,7 @@ INSTALLED_APPS = [
     'puput',
     'anymail',
     'feedler',
+    'colorful',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -69,10 +72,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_social_share'
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,8 +88,8 @@ MIDDLEWARE_CLASSES = [
 
     'django.middleware.locale.LocaleMiddleware',
 
-    'wagtail.wagtailcore.middleware.SiteMiddleware',
-    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'publichealth.urls'
@@ -146,6 +152,7 @@ PASSWORD_REQUIRED_TEMPLATE = 'password.html'
 LANGUAGES = (
    ('de', u'Deutsch'),
    ('fr', u'Français'),
+   ('en', u'English'),
 )
 LANGUAGE_CODE = 'de' # default language
 
@@ -169,6 +176,10 @@ STATICFILES_DIRS = [
     os.path.join(PROJECT_DIR, 'static'),
 ]
 
+# Whitenoise compression and caching support
+# http://whitenoise.evans.io/en/stable/django.html
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
@@ -186,6 +197,12 @@ COMPRESS_PRECOMPILERS = [
 # Wagtail settings
 
 WAGTAIL_SITE_NAME = "Public Health Schweiz"
+
+WAGTAILADMIN_RICH_TEXT_EDITORS = {
+    'default': {
+        'WIDGET': 'wagtail.admin.rich_text.HalloRichTextArea'
+    }
+}
 
 # Puput settings
 

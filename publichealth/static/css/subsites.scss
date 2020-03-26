@@ -1,0 +1,63 @@
+// TODO: delete this file and references to it once styles are migrated.
+
+// Only show news on the main home page
+#news { display: none; }
+.site-home #news { display: block; }
+
+// Custom styles for sphc.ch
+.site-sphc {
+
+  // Language menu hack, until this is configurable
+  nav .language-nav a[lang='en'] { display: inline; }
+
+  #footer, .contact-nav .link { display: none; }
+
+  a.navbar-brand {
+    height: 60px;
+    padding-right: 62px;
+    background: url('/static/org/ssph-logo.jpg') center right no-repeat;
+    background-size: auto 75%;
+    overflow: hidden;
+  }
+
+  #carousel-banner  .carousel-caption > * { display: none; }
+  #carousel-banner .carousel-caption { display: none; }
+}
+// -site-sphc
+
+// Custom styles for ngo-allianz-ebk.ch
+.site-ngo-allianz-ebk {
+  .navbar-pre .contact-nav { display: none; }
+  footer#footer, .navbar-pre {
+     background-color: #dd4466;
+  }
+  .content-page {
+    padding-top: 50px;
+  }
+  .navbar-brand {
+    width: 240px;
+    height: 64px;
+    background-size: contain !important;
+    background-repeat: no-repeat;
+    background-image: url('/static/org/NGO-Allianz_Logo-de.jpg');
+
+    font-size: 0px !important;
+    img { display: none !important; }
+  }
+  #carousel-banner .carousel-caption { display: none; }
+}
+html[lang='fr'] .site-ngo-allianz-ebk .navbar-brand {
+  background-image: url('/static/org/NGO-Allianz_Logo-fr.jpg');
+}
+// -site-ngo-allianz-ebk
+
+// Custom styles for gesundheitsmanifest.ch
+.site-gesundheitsmanifest {
+  .navbar-pre {
+     background-color: #ccb;
+  }
+  section {
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+  }
+}

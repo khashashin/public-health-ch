@@ -8,6 +8,9 @@ TEMPLATES[0]['OPTIONS']['debug'] = True
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'CHANGEME!!!'
 
+# SECURITY WARNING: CAREFUL! your dev site is open to the world
+ALLOWED_HOSTS = ['*']
+
 INTERNAL_IPS = ('127.0.0.1', '10.0.2.2')
 
 BASE_URL = 'http://localhost:8000'
@@ -21,8 +24,10 @@ DATABASES = {
     }
 }
 
-INSTALLED_APPS = INSTALLED_APPS + [
-    'wagtail.contrib.wagtailstyleguide',
+INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
+] + INSTALLED_APPS + [
+    'wagtail.contrib.styleguide',
 ]
 
 try:

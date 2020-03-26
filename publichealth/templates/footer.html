@@ -1,5 +1,5 @@
-{% load wagtailcore_tags navigation information %}
-{% get_site_root as site_root %}
+{% load static wagtailcore_tags navigation information %}
+{% get_site as the_site %}
 
 <!-- Footer -->
 <footer id="footer">
@@ -20,15 +20,20 @@
 
 	<a name="contact-info"></a>
 	<div class="col-md-4" id="contact-info">
-		{% contact_info %}
+		{% contact_info the_site=the_site %}
 	</div>
 	<div class="col-md-4" id="contact-form">
-		{% footer_form %}
+		{% footer_form the_site=the_site %}
 	</div>
 </div><!-- /row -->
 </div><!-- /container -->
 </footer>
 
 <div class="copyright">
-	&copy; 2017 Public Health Schweiz
+	{% contact_name the_site=the_site %}
+	&copy; 2020
+	&bull; <a href="/privacy/">Privacy</a>
+	&bull; <a href="/impressum/">Impressum</a>
 </div>
+
+<link rel="stylesheet" type="text/css" href="{% static 'libs/cookieconsent/build/cookieconsent.min.css' %}">

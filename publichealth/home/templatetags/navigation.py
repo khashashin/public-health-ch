@@ -4,29 +4,44 @@ from django.utils import translation
 
 register = template.Library()
 
+@register.simple_tag()
+def language_cur():
+    return translation.get_language()
+
 # Language switcher
 @register.inclusion_tag('tags/language.html', takes_context=True)
 def language_switcher(context):
     url = '/$lang$'
     if 'page' in context:
-        url = context['page'].url.split('/')
-        if len(url) > 2 and len(url[1]) >= 2:
-            url[1] = '$lang$'
-            url = '/'.join(url)
+        urlparts = context['page'].get_url_parts()
+        if urlparts is not None:
+            s, r, page_url_relative_to_site_root = urlparts
+            url = page_url_relative_to_site_root.split('/')
+            if len(url) > 0 and len(url[1]) == 2:
+                url[1] = '$lang$'
+                url = '/'.join(url)
+            else:
+                url = '/$lang$'
+    language_array = [
+        { 'code': 'de', 'title': 'De', 'url': url.replace('$lang$','de') },
+        { 'code': 'fr', 'title': 'Fr', 'url': url.replace('$lang$','fr') },
+        { 'code': 'en', 'title': 'En', 'url': url.replace('$lang$','en') }
+    ]
     return {
-        'languages': [
-            { 'code': 'de', 'title': 'De', 'url': url.replace('$lang$','de') },
-            { 'code': 'fr', 'title': 'Fr', 'url': url.replace('$lang$','fr') }
-        ],
+        'languages': language_array,
         'currentlangcode': translation.get_language(),
         'request': context['request'],
     }
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
+def get_site(context):
+    return context['request'].site
+
+@register.simple_tag(takes_context=True)
 def get_site_root(context):
     # NB this returns a core.Page, not the implementation-specific model used
     # so object-comparison to self will return false as objects would differ
-    return context['request'].site.root_page
+    return get_site(context).root_page
 
 def has_menu_children(page):
     return page.get_children().live().in_menu().exists()
